@@ -1,5 +1,6 @@
 
 from sqlalchemy import select
+
 from modelos import CategoriaModel, EtiquetaModel, ProductoModel
 
 
@@ -55,3 +56,30 @@ def test_relacion_muchos_a_muchos_producto_etiquetas(db_session):
 
     assert tag_db is not None
     assert tag_db.productos[0].nombre == "Cafetera"
+def test_eliminacion_en_cascada_categoria_productos(db_session):
+    categoria = CategoriaModel(nombre="Electrónica")
+
+    producto1 = ProductoModel(
+        nombre="Teclado",
+        precio=80.0,
+        categoria=categoria,
+    )
+    producto2 = ProductoModel(
+        nombre="Monitor",
+        precio=700.0,
+        categoria=categoria,
+    )
+
+    db_session.add_all([categoria, producto1, producto2])
+    db_session.commit()
+
+    assert len(categoria.productos) == 2
+
+    db_session.delete(categoria)
+    db_session.commit()
+
+    productos_restantes = db_session.scalars(
+        select(ProductoModel)
+    ).all()
+
+    assert len(productos_restantes) == 0

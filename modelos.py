@@ -41,9 +41,10 @@ class CategoriaModel(Base):
     )
 
     productos: Mapped[list["ProductoModel"]] = relationship(
-        "ProductoModel",
-        back_populates="categoria",
-    )
+    "ProductoModel",
+    back_populates="categoria",
+    cascade="all, delete-orphan",
+)
 
 
 class ProductoModel(Base):
